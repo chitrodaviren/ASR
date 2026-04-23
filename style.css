@@ -35,6 +35,7 @@ input, select {
 .btn-group {
   display: flex;
   gap: 10px;
+  margin-bottom: 15px; /* FIXED spacing */
 }
 
 button {
@@ -60,7 +61,10 @@ button.clear {
   margin-bottom: 5px;
 }
 
-/* MOBILE */
+.result-card, .history-card {
+  margin-top: 10px;
+}
+
 @media(max-width:500px){
   .container {
     padding: 10px;
