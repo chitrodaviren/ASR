@@ -80,7 +80,11 @@ function calculate() {
   document.getElementById("gst").innerText = `GST: ₹${gst.toFixed(2)}`;
   document.getElementById("grand").innerText = `Grand Total: ₹${grandTotal.toFixed(2)}`;
 
-  saveHistory(size, totalWeight, grandTotal);
+  // FIXED HISTORY
+  let [width, depth] = size.split("x");
+  let rackSize = `${height} x ${width} x ${depth}`;
+
+  saveHistory(rackSize, totalWeight, totalAmount);
 }
 
 // CLEAR INPUTS
@@ -97,7 +101,7 @@ function clearFields() {
   document.getElementById("grand").innerText = "";
 }
 
-// HISTORY
+// HISTORY SAVE
 function saveHistory(size, weight, total) {
   let history = JSON.parse(localStorage.getItem("rackHistory")) || [];
 
@@ -111,6 +115,7 @@ function saveHistory(size, weight, total) {
   loadHistory();
 }
 
+// HISTORY LOAD
 function loadHistory() {
   let history = JSON.parse(localStorage.getItem("rackHistory")) || [];
   let div = document.getElementById("history");
@@ -118,10 +123,15 @@ function loadHistory() {
   div.innerHTML = "";
 
   history.slice().reverse().forEach(item => {
-    div.innerHTML += `<div>Size: ${item.size} | ${item.weight}kg | ₹${item.total}</div>`;
+    div.innerHTML += `
+      <div>
+        Rack: ${item.size} | ${item.weight} kg | ₹${item.total}
+      </div>
+    `;
   });
 }
 
+// CLEAR HISTORY
 function clearHistory() {
   localStorage.removeItem("rackHistory");
   loadHistory();
