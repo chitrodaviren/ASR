@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rack Calculator Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Rack Calculator Pro</h1>
+
+  <div class="card">
+    <h2>Angle</h2>
+    <select id="angleType"></select>
+    <input type="number" id="height" placeholder="Height (ft)">
+    <input type="number" id="angleQty" placeholder="Qty">
+  </div>
+
+  <div class="card">
+    <h2>Shelves</h2>
+    <select id="shelfSize"></select>
+    <select id="shelfGauge"></select>
+    <input type="number" id="shelfQty" placeholder="Qty">
+  </div>
+
+  <div class="card">
+    <h2>Price</h2>
+    <input type="number" id="priceKg" placeholder="₹ per kg">
+  </div>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="result-card">
+    <h2>Result</h2>
+    <p id="weight"></p>
+    <p id="nuts"></p>
+    <p id="amount"></p>
+    <p id="gst"></p>
+    <p id="grand"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
