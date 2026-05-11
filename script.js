@@ -1,129 +1,49 @@
-let data;
-
-fetch('data.json')
-.then(res => res.json())
-.then(d => {
-  data = d;
-  loadData();
-  loadHistory();
-});
-
-// SERVICE WORKER
+// Register Service Worker for Icon/Installability
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+    navigator.serviceWorker.register('sw.js');
 }
 
-function loadData() {
-  let angleSelect = document.getElementById("angleType");
+// Load Weight Data and Calculate
+async function calc() {
+    try {
+        const response = await fetch('data.json');
+        const data = await response.json();
+        
+        const h = parseFloat(document.getElementById('aH').value) || 0;
+        const aq = parseFloat(document.getElementById('aQ').value) || 0;
+        const ag = document.getElementById('aGauge').value;
+        const sq = parseFloat(document.getElementById('sQ').value) || 0;
+        const ss = document.getElementById('sSize').value;
+        const sg = document.getElementById('sGauge').value;
+        const r = parseFloat(document.getElementById('rate').value) || 0;
 
-  data.angles.forEach(a => {
-    let opt = document.createElement("option");
-    opt.value = a.weight;
-    opt.text = a.type;
-    angleSelect.add(opt);
-  });
+        const agFactor = data.angleFactors[ag];
+        const shelfUnitWt = data.shelfWeights[ss][sg] || 0;
 
-  let shelfSize = document.getElementById("shelfSize");
+        let angleWt = (h * agFactor) * aq;
+        let totalShelfWt = shelfUnitWt * sq;
+        let totalWt = angleWt + totalShelfWt;
 
-  Object.keys(data.shelves).forEach(size => {
-    let opt = document.createElement("option");
-    opt.value = size;
-    opt.text = size;
-    shelfSize.add(opt);
-  });
+        // Nut & Bolt Standard Logic
+        let nb = sq > 0 ? 32 + ((sq - 2) * 8) : 0;
+        
+        let basePrice = totalWt * r;
+        let gstAmount = basePrice * 0.18;
+        let grandTotal = basePrice + gstAmount;
 
-  shelfSize.addEventListener("change", loadGauge);
-  loadGauge();
+        // Update UI
+        document.getElementById('w_total').innerText = totalWt.toFixed(2) + " kg";
+        document.getElementById('nb_total').innerText = nb + " pcs";
+        document.getElementById('price_base').innerText = "₹" + Math.round(basePrice).toLocaleString('en-IN');
+        document.getElementById('gst_amt').innerText = "₹" + Math.round(gstAmount).toLocaleString('en-IN');
+        document.getElementById('price_grand').innerText = "₹" + Math.round(grandTotal).toLocaleString('en-IN');
+
+    } catch (error) {
+        console.error("Data Load Error:", error);
+    }
 }
 
-function loadGauge() {
-  let size = document.getElementById("shelfSize").value;
-  let gaugeSelect = document.getElementById("shelfGauge");
-
-  gaugeSelect.innerHTML = "";
-
-  let gauges = data.shelves[size];
-
-  Object.keys(gauges).forEach(g => {
-    let opt = document.createElement("option");
-    opt.value = g;
-    opt.text = g + " gauge";
-    gaugeSelect.add(opt);
-  });
-}
-
-function calculate() {
-  let weightPerFt = +document.getElementById("angleType").value;
-  let height = +document.getElementById("height").value;
-  let angleQty = +document.getElementById("angleQty").value;
-
-  let size = document.getElementById("shelfSize").value;
-  let gauge = document.getElementById("shelfGauge").value;
-  let shelfQty = +document.getElementById("shelfQty").value;
-
-  let priceKg = +document.getElementById("priceKg").value;
-
-  if (!height || !angleQty || !shelfQty || !priceKg) {
-    alert("Fill all fields");
-    return;
-  }
-
-  let angleWeight = weightPerFt * height * angleQty;
-  let shelfWeight = data.shelves[size][gauge] * shelfQty;
-
-  let totalWeight = angleWeight + shelfWeight;
-  let nutBolts = 32 + ((shelfQty - 2) * 8);
-
-  let totalAmount = totalWeight * priceKg;
-  let gst = totalAmount * 0.18;
-  let grandTotal = totalAmount + gst;
-
-  document.getElementById("weight").innerText = `Total Weight: ${totalWeight.toFixed(2)} kg`;
-  document.getElementById("nuts").innerText = `Nut & Bolts: ${nutBolts}`;
-  document.getElementById("amount").innerText = `Amount: ₹${totalAmount.toFixed(2)}`;
-  document.getElementById("gst").innerText = `GST: ₹${gst.toFixed(2)}`;
-  document.getElementById("grand").innerText = `Grand Total: ₹${grandTotal.toFixed(2)}`;
-
-  let [w, d] = size.split("x");
-  let rackSize = `${height} x ${w} x ${d}`;
-
-  saveHistory(rackSize, totalWeight, totalAmount);
-}
-
-function clearFields() {
-  document.getElementById("height").value = "";
-  document.getElementById("angleQty").value = "";
-  document.getElementById("shelfQty").value = "";
-  document.getElementById("priceKg").value = "";
-
-  document.getElementById("weight").innerText = "";
-}
-
-function saveHistory(size, weight, total) {
-  let history = JSON.parse(localStorage.getItem("rackHistory")) || [];
-
-  history.push({
-    size,
-    weight: weight.toFixed(2),
-    total: total.toFixed(2)
-  });
-
-  localStorage.setItem("rackHistory", JSON.stringify(history));
-  loadHistory();
-}
-
-function loadHistory() {
-  let history = JSON.parse(localStorage.getItem("rackHistory")) || [];
-  let div = document.getElementById("history");
-
-  div.innerHTML = "";
-
-  history.slice().reverse().forEach(item => {
-    div.innerHTML += `<div>Rack: ${item.size} | ${item.weight}kg | ₹${item.total}</div>`;
-  });
-}
-
-function clearHistory() {
-  localStorage.removeItem("rackHistory");
-  loadHistory();
+function clearAll() {
+    document.querySelectorAll('input').forEach(i => i.value = '');
+    calc();
 }
