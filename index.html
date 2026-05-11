@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Angle Rack Pro</title>
-    
     <link rel="stylesheet" href="style.css">
-    
     <link rel="manifest" href="manifest.json">
-    
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -70,8 +67,14 @@
 
         <div class="btn-group">
             <button class="btn btn-clear" onclick="clearAll()">Clear</button>
-            <button class="btn btn-save" onclick="location.reload()">Refresh App</button>
+            <button class="btn btn-save" onclick="saveHistory()">Save Quote</button>
         </div>
+    </div>
+
+    <div id="history-section" style="margin-top:25px; width:100%;">
+        <h3 id="histHeader" style="display:none; font-size: 0.8rem; color: #64748b; margin-bottom:10px; text-transform: uppercase;">Recent Quotes</h3>
+        <div id="historyList"></div>
+        <button id="clearHistBtn" onclick="clearHistory()" style="display:none; background:none; border:1px solid #ef4444; color:#ef4444; padding:8px; border-radius:10px; width:100%; font-weight:bold; margin-top:10px; font-size:0.75rem;">Clear History</button>
     </div>
 </div>
 
