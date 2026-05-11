@@ -1,7 +1,7 @@
 const CACHE_NAME = 'angle-calc-v1';
 const urlsToCache = [
   'index.html',
-  'manifesticon.png',
+  'icon.png',
   'manifest.json'
 ];
 
